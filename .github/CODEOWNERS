@@ -1,0 +1,34 @@
+# Code Owners for JKLoger
+
+# Global owners - these users will be requested for review on all PRs
+* @Jaker
+
+# Core library code
+/JKLoger/ @Jaker
+/JKLoger/**/*.h @Jaker
+/JKLoger/**/*.m @Jaker
+
+# Package management files
+/JKLoger.podspec @Jaker
+/Package.swift @Jaker
+
+# Documentation
+/Docs/ @Jaker
+/README.md @Jaker
+/CHANGELOG.md @Jaker
+/CONTRIBUTING.md @Jaker
+
+# CI/CD and GitHub configuration
+/.github/ @Jaker
+/Scripts/ @Jaker
+
+# Tests
+/Tests/ @Jaker
+/*test*.m @Jaker
+
+# Example project
+/Example/ @Jaker
+
+# Security-related files
+/.github/SECURITY.md @Jaker
+/SECURITY.md @Jaker

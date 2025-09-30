@@ -1,0 +1,86 @@
+# SwiftLint Configuration for JKLoger
+# This configuration is primarily for any Swift code in the project
+
+# Paths to include during linting
+included:
+  - JKLoger
+  - Example
+  - Tests
+
+# Paths to exclude during linting
+excluded:
+  - Carthage
+  - Pods
+  - build
+  - DerivedData
+  - .build
+
+# Rules to disable
+disabled_rules:
+  - trailing_whitespace  # We handle this in our own formatting
+  - line_length         # Objective-C has different conventions
+
+# Rules to enable (opt-in rules)
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - overridden_super_call
+  - redundant_nil_coalescing
+  - unused_optional_binding
+
+# Rule configurations
+line_length:
+  warning: 120
+  error: 150
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_urls: true
+
+function_body_length:
+  warning: 50
+  error: 100
+
+file_length:
+  warning: 500
+  error: 1000
+
+type_body_length:
+  warning: 300
+  error: 500
+
+# Identifier naming rules
+identifier_name:
+  min_length:
+    warning: 2
+    error: 1
+  max_length:
+    warning: 40
+    error: 50
+  excluded:
+    - id
+    - URL
+    - url
+    - i
+    - j
+    - k
+
+# Custom rules for Objective-C compatibility
+custom_rules:
+  # Ensure proper header imports
+  objc_header_imports:
+    name: "Objective-C Header Imports"
+    regex: '#import\s+"[^"]*\.h"'
+    message: "Use angle brackets for system headers and quotes for local headers"
+    severity: warning
+    
+  # Check for proper nullability annotations
+  nullability_annotations:
+    name: "Nullability Annotations"
+    regex: '\*\s*\)\s*[a-zA-Z_][a-zA-Z0-9_]*\s*[;,)]'
+    message: "Consider adding nullability annotations"
+    severity: warning
+
+# Reporter type
+reporter: "xcode"

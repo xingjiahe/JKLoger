@@ -1,0 +1,180 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Build Framework
+      run: |
+        xcodebuild \
+          -workspace JKLoger.xcworkspace \
+          -scheme JKLoger \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          clean build \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          PROVISIONING_PROFILE="" \
+          | xcpretty
+          
+    - name: Create XCFramework
+      run: |
+        xcodebuild -create-xcframework \
+          -framework build/Release-iphoneos/JKLoger.framework \
+          -output JKLoger.xcframework
+          
+    - name: Archive XCFramework
+      run: |
+        zip -r JKLoger.xcframework.zip JKLoger.xcframework
+        
+    - name: Generate Release Notes
+      id: release_notes
+      run: |
+        # Extract version from tag
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        
+        # Generate release notes from CHANGELOG.md
+        awk "/^## \[$VERSION\]/{flag=1; next} /^## \[/{flag=0} flag" CHANGELOG.md > release_notes.md
+        
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: JKLoger ${{ steps.release_notes.outputs.VERSION }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+        
+    - name: Upload XCFramework
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./JKLoger.xcframework.zip
+        asset_name: JKLoger.xcframework.zip
+        asset_content_type: application/zip
+
+  cocoapods:
+    name: Deploy to CocoaPods
+    runs-on: macos-latest
+    needs: release
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        bundler-cache: true
+        
+    - name: Install CocoaPods
+      run: gem install cocoapods
+      
+    - name: Deploy to CocoaPods
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      run: |
+        pod trunk push JKLoger.podspec --allow-warnings
+
+  documentation:
+    name: Deploy Documentation
+    runs-on: macos-latest
+    needs: release
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Generate Documentation Site
+      run: |
+        mkdir -p docs-site
+        cp -r Docs/* docs-site/
+        cp README.md docs-site/index.md
+        
+        # Create a simple index.html
+        cat > docs-site/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>JKLoger Documentation</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 40px; }
+                .header { text-align: center; margin-bottom: 40px; }
+                .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+                .doc-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+                .doc-card h3 { margin-top: 0; }
+                .doc-card a { text-decoration: none; color: #007AFF; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>JKLoger Documentation</h1>
+                <p>Lightweight and extensible logging library for iOS</p>
+            </div>
+            <div class="docs-grid">
+                <div class="doc-card">
+                    <h3><a href="GettingStarted.md">Getting Started</a></h3>
+                    <p>Quick setup and basic usage guide</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="API.md">API Reference</a></h3>
+                    <p>Complete API documentation with examples</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="Usage.md">Usage Guide</a></h3>
+                    <p>Practical examples and best practices</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="AdvancedFeatures.md">Advanced Features</a></h3>
+                    <p>Custom destinations, formatters, and patterns</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="Performance.md">Performance Guide</a></h3>
+                    <p>Optimization tips and best practices</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="FAQ.md">FAQ</a></h3>
+                    <p>Frequently asked questions and answers</p>
+                </div>
+                <div class="doc-card">
+                    <h3><a href="Troubleshooting.md">Troubleshooting</a></h3>
+                    <p>Common issues and detailed solutions</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+    - name: Upload Pages Artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs-site
+        
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v2

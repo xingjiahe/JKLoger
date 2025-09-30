@@ -1,0 +1,159 @@
+name: Question
+description: Ask a question about JKLoger usage or implementation
+title: "[Question]: "
+labels: ["question", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about JKLoger? We're here to help! Please check our documentation first, then provide as much context as possible.
+
+  - type: checkboxes
+    id: documentation-check
+    attributes:
+      label: Documentation Check
+      description: Have you checked our documentation?
+      options:
+        - label: I have read the [Getting Started Guide](https://github.com/Jaker/JKLoger/blob/main/Docs/GettingStarted.md)
+        - label: I have checked the [API Reference](https://github.com/Jaker/JKLoger/blob/main/Docs/API.md)
+        - label: I have reviewed the [Usage Guide](https://github.com/Jaker/JKLoger/blob/main/Docs/Usage.md)
+        - label: I have looked at the [FAQ](https://github.com/Jaker/JKLoger/blob/main/Docs/FAQ.md)
+        - label: I have checked the [Example Project](https://github.com/Jaker/JKLoger/tree/main/Example)
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What type of question is this?
+      options:
+        - Installation and Setup
+        - Basic Usage
+        - Advanced Configuration
+        - Custom Destinations
+        - Custom Formatters
+        - Performance Optimization
+        - Troubleshooting
+        - Integration with Other Libraries
+        - Best Practices
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know about JKLoger?
+      placeholder: Please describe your question in detail...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide context about what you're trying to achieve
+      placeholder: |
+        I'm trying to...
+        My goal is to...
+        I want to implement...
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-approach
+    attributes:
+      label: What Have You Tried?
+      description: Describe what you've already attempted
+      placeholder: |
+        I tried...
+        I looked at...
+        I attempted to...
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-sample
+    attributes:
+      label: Current Code
+      description: Share your current implementation (if applicable)
+      render: objc
+      placeholder: |
+        // Your current JKLoger setup or usage
+        JKLogger *logger = [JKLogger sharedLogger];
+        // ... your code here
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: JKLoger Version
+      description: What version of JKLoger are you using?
+      placeholder: "1.0.0"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: What platform are you working with?
+      options:
+        - iOS
+        - iOS Simulator
+        - macOS (Catalyst)
+        - Not platform-specific
+    validations:
+      required: false
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation Method
+      description: How did you install JKLoger?
+      options:
+        - CocoaPods
+        - Swift Package Manager
+        - Manual Integration
+        - Carthage
+        - Haven't installed yet
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-outcome
+    attributes:
+      label: Expected Outcome
+      description: What result are you hoping to achieve?
+      placeholder: |
+        I expect to...
+        The desired behavior is...
+        I want to see...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information, error messages, or context
+      placeholder: |
+        Error messages:
+        Additional context:
+        Related issues:
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: help-others
+    attributes:
+      label: Community Help
+      description: How can this question help others?
+      options:
+        - label: This question might be common among new users
+        - label: The answer could be added to the FAQ
+        - label: This might reveal a gap in our documentation
+        - label: This could lead to a useful example or tutorial

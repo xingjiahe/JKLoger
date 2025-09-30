@@ -1,0 +1,173 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+
+jobs:
+  test:
+    name: Test
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination: ['platform=iOS Simulator,OS=17.0,name=iPhone 15 Pro']
+        
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Xcode version
+      run: /usr/bin/xcodebuild -version
+      
+    - name: Build and Test
+      run: |
+        xcodebuild \
+          -workspace JKLoger.xcworkspace \
+          -scheme JKLoger \
+          -destination '${{ matrix.destination }}' \
+          clean build test \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          PROVISIONING_PROFILE="" \
+          -enableCodeCoverage YES \
+          | xcpretty
+          
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./build/reports/coverage.xml
+        fail_ci_if_error: false
+
+  example-build:
+    name: Build Example
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Build Example Project
+      run: |
+        cd Example
+        xcodebuild \
+          -workspace JKLogerExample.xcworkspace \
+          -scheme JKLogerExample \
+          -destination 'platform=iOS Simulator,OS=17.0,name=iPhone 15 Pro' \
+          clean build \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          PROVISIONING_PROFILE="" \
+          | xcpretty
+
+  cocoapods:
+    name: CocoaPods Lint
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        bundler-cache: true
+        
+    - name: Install CocoaPods
+      run: gem install cocoapods
+      
+    - name: Lint Podspec
+      run: pod lib lint JKLoger.podspec --allow-warnings
+
+  spm:
+    name: Swift Package Manager
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Build with SPM
+      run: swift build
+
+  documentation:
+    name: Documentation
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Validate Documentation
+      run: |
+        chmod +x Scripts/generate_docs.sh
+        ./Scripts/generate_docs.sh
+        
+    - name: Check Documentation Links
+      run: |
+        # Install markdown-link-check
+        npm install -g markdown-link-check
+        
+        # Check all markdown files
+        find . -name "*.md" -not -path "./node_modules/*" -exec markdown-link-check {} \;
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Run Static Analysis
+      run: |
+        xcodebuild \
+          -workspace JKLoger.xcworkspace \
+          -scheme JKLoger \
+          -destination 'platform=iOS Simulator,OS=17.0,name=iPhone 15 Pro' \
+          analyze \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGN_IDENTITY="" \
+          PROVISIONING_PROFILE="" \
+          | xcpretty
+
+  performance:
+    name: Performance Tests
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Run Performance Tests
+      run: |
+        # Compile and run performance tests
+        clang -framework Foundation -o performance_test comprehensive_test.m JKLoger/*.m JKLoger/*/*.m
+        ./performance_test
+        
+    - name: Upload Performance Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: performance-results
+        path: performance_results.txt

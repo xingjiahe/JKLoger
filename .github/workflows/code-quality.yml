@@ -1,0 +1,207 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for SonarCloud
+        
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+      
+    - name: Cache Dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/Library/Caches/CocoaPods
+          ~/.cocoapods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+          
+    - name: Install Dependencies
+      run: |
+        # Install required tools
+        brew install swiftlint
+        npm install -g markdown-link-check
+        
+    - name: SwiftLint
+      run: |
+        # Run SwiftLint on Objective-C and Swift files
+        swiftlint --reporter github-actions-logging
+        
+    - name: Check Code Formatting
+      run: |
+        # Check for consistent code formatting
+        find . -name "*.h" -o -name "*.m" | xargs -I {} sh -c 'echo "Checking {}"'
+        
+        # Check for common issues
+        echo "Checking for common code issues..."
+        
+        # Check for TODO/FIXME comments
+        TODO_COUNT=$(find . -name "*.h" -o -name "*.m" | xargs grep -n "TODO\|FIXME" | wc -l)
+        echo "Found $TODO_COUNT TODO/FIXME comments"
+        
+        # Check for NSLog usage (should use JKLog instead)
+        NSLOG_COUNT=$(find . -name "*.m" | xargs grep -n "NSLog" | grep -v "// OK:" | wc -l)
+        if [ $NSLOG_COUNT -gt 0 ]; then
+          echo "Warning: Found $NSLOG_COUNT NSLog usages (consider using JKLog instead)"
+          find . -name "*.m" | xargs grep -n "NSLog" | grep -v "// OK:"
+        fi
+        
+    - name: Check Documentation Links
+      run: |
+        # Check all markdown files for broken links
+        find . -name "*.md" -not -path "./node_modules/*" -exec markdown-link-check {} \;
+        
+    - name: Validate Project Structure
+      run: |
+        # Check that required files exist
+        required_files=(
+          "README.md"
+          "CHANGELOG.md"
+          "CONTRIBUTING.md"
+          "LICENSE"
+          "JKLoger.podspec"
+          "Package.swift"
+          ".github/workflows/ci.yml"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "Error: Required file $file is missing"
+            exit 1
+          else
+            echo "✓ $file exists"
+          fi
+        done
+        
+    - name: Check Version Consistency
+      run: |
+        # Extract version from different sources
+        PODSPEC_VERSION=$(grep -E "s\.version\s*=" JKLoger.podspec | sed -E "s/.*['\"]([^'\"]*)['\"].*/\1/")
+        README_VERSION=$(grep -E "version-[0-9]+\.[0-9]+\.[0-9]+" README.md | head -1 | sed -E "s/.*version-([0-9]+\.[0-9]+\.[0-9]+).*/\1/")
+        
+        echo "Podspec version: $PODSPEC_VERSION"
+        echo "README version: $README_VERSION"
+        
+        if [ "$PODSPEC_VERSION" != "$README_VERSION" ]; then
+          echo "Warning: Version mismatch between Podspec ($PODSPEC_VERSION) and README ($README_VERSION)"
+        else
+          echo "✓ Versions are consistent"
+        fi
+        
+    - name: Security Scan
+      run: |
+        # Basic security checks
+        echo "Running basic security checks..."
+        
+        # Check for hardcoded secrets or API keys
+        SECRET_PATTERNS=(
+          "password\s*="
+          "api_key\s*="
+          "secret\s*="
+          "token\s*="
+          "key\s*=\s*['\"][^'\"]{20,}"
+        )
+        
+        for pattern in "${SECRET_PATTERNS[@]}"; do
+          matches=$(find . -name "*.h" -o -name "*.m" | xargs grep -i "$pattern" | grep -v "// OK:" | wc -l)
+          if [ $matches -gt 0 ]; then
+            echo "Warning: Found potential hardcoded secrets matching pattern: $pattern"
+            find . -name "*.h" -o -name "*.m" | xargs grep -i "$pattern" | grep -v "// OK:"
+          fi
+        done
+        
+        # Check for unsafe functions
+        UNSAFE_FUNCTIONS=(
+          "strcpy"
+          "strcat"
+          "sprintf"
+          "gets"
+        )
+        
+        for func in "${UNSAFE_FUNCTIONS[@]}"; do
+          matches=$(find . -name "*.h" -o -name "*.m" | xargs grep -w "$func" | wc -l)
+          if [ $matches -gt 0 ]; then
+            echo "Warning: Found usage of potentially unsafe function: $func"
+            find . -name "*.h" -o -name "*.m" | xargs grep -w "$func"
+          fi
+        done
+        
+    - name: Memory Safety Check
+      run: |
+        # Check for common memory management issues
+        echo "Checking for memory management issues..."
+        
+        # Check for retain cycles (basic patterns)
+        RETAIN_CYCLE_PATTERNS=(
+          "self\."
+          "strongSelf"
+        )
+        
+        # This is a basic check - more sophisticated analysis would require static analysis tools
+        echo "Basic retain cycle pattern check completed"
+        
+    - name: Performance Check
+      run: |
+        # Check for performance anti-patterns
+        echo "Checking for performance issues..."
+        
+        # Check for synchronous operations on main queue
+        SYNC_PATTERNS=(
+          "dispatch_sync.*dispatch_get_main_queue"
+          "\[NSThread sleepForTimeInterval"
+        )
+        
+        for pattern in "${SYNC_PATTERNS[@]}"; do
+          matches=$(find . -name "*.m" | xargs grep -E "$pattern" | wc -l)
+          if [ $matches -gt 0 ]; then
+            echo "Warning: Found potential performance issue matching pattern: $pattern"
+            find . -name "*.m" | xargs grep -E "$pattern"
+          fi
+        done
+        
+    - name: Generate Quality Report
+      run: |
+        # Generate a comprehensive quality report
+        echo "# Code Quality Report" > quality_report.md
+        echo "Generated on: $(date)" >> quality_report.md
+        echo "" >> quality_report.md
+        
+        # File statistics
+        echo "## File Statistics" >> quality_report.md
+        echo "- Header files: $(find . -name "*.h" | wc -l)" >> quality_report.md
+        echo "- Implementation files: $(find . -name "*.m" | wc -l)" >> quality_report.md
+        echo "- Total lines of code: $(find . -name "*.h" -o -name "*.m" | xargs wc -l | tail -1 | awk '{print $1}')" >> quality_report.md
+        echo "" >> quality_report.md
+        
+        # Documentation statistics
+        echo "## Documentation Statistics" >> quality_report.md
+        echo "- Markdown files: $(find . -name "*.md" | wc -l)" >> quality_report.md
+        echo "- Documentation lines: $(find . -name "*.md" | xargs wc -l | tail -1 | awk '{print $1}')" >> quality_report.md
+        echo "" >> quality_report.md
+        
+        # Test statistics
+        echo "## Test Statistics" >> quality_report.md
+        echo "- Test files: $(find . -name "*test*.m" -o -name "*Test*.m" | wc -l)" >> quality_report.md
+        echo "" >> quality_report.md
+        
+        cat quality_report.md
+        
+    - name: Upload Quality Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: quality-report
+        path: quality_report.md

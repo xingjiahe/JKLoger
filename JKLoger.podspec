@@ -1,0 +1,50 @@
+Pod::Spec.new do |s|
+  s.name             = 'JKLoger'
+  s.version          = '1.0.0'
+  s.summary          = 'A lightweight and extensible logging library for iOS'
+  s.description      = <<-DESC
+                       JKLoger is a lightweight, high-performance Objective-C logging library 
+                       designed for iOS applications. It provides multiple log levels, extensible 
+                       output destinations, customizable formatters, and thread-safe logging 
+                       capabilities. Similar to CocoaLumberjack but more lightweight and easier to use.
+                       
+                       Features:
+                       • Multiple log levels (Fatal, Error, Warning, Info, Debug)
+                       • Extensible output destinations (Console, File, Remote)
+                       • Customizable log formatters
+                       • Thread-safe logging with serial queue
+                       • Simple macro interface for easy usage
+                       • iOS 13+ support
+                       DESC
+
+  s.homepage         = 'https://github.com/xingjiahe/JKLoger'
+  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.author           = { 'xingjiahe' => 'jakerxing@foxmail.com' }
+  s.source           = { :git => 'https://github.com/xingjiahe/JKLoger.git', :tag => s.version.to_s }
+
+  s.ios.deployment_target = '13.0'
+  s.requires_arc = true
+
+  s.source_files = 'JKLoger/**/*.{h,m}'
+  s.public_header_files = 'JKLoger/**/*.h'
+  
+  s.frameworks = 'Foundation'
+  
+  # Subspecs for modular usage
+  s.subspec 'Core' do |core|
+    core.source_files = 'JKLoger/*.{h,m}'
+    core.public_header_files = 'JKLoger/*.h'
+  end
+  
+  s.subspec 'Destinations' do |destinations|
+    destinations.source_files = 'JKLoger/Destinations/*.{h,m}'
+    destinations.public_header_files = 'JKLoger/Destinations/*.h'
+    destinations.dependency 'JKLoger/Core'
+  end
+  
+  s.subspec 'Formatters' do |formatters|
+    formatters.source_files = 'JKLoger/Formatters/*.{h,m}'
+    formatters.public_header_files = 'JKLoger/Formatters/*.h'
+    formatters.dependency 'JKLoger/Core'
+  end
+end

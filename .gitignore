@@ -1,0 +1,40 @@
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+project.xcworkspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+# CocoaPods
+Pods/
+
+# SPM
+.swiftpm/
+.build/
+
+# Compiled test files
+*.o
+*.a
+simple_test
+macro_test
+file_test
+demo
+cleanup_test
+comprehensive_test
+remote_test
+formatter_test
+example_syntax_test
+example_demo
+docs_demo
+
+# IDE
+.kiro/
