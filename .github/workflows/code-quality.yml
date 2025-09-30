@@ -201,7 +201,7 @@ jobs:
         cat quality_report.md
         
     - name: Upload Quality Report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: quality-report
         path: quality_report.md
