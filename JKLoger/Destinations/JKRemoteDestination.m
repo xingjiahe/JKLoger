@@ -7,8 +7,8 @@
 //
 
 #import "JKRemoteDestination.h"
-#import "../JKLogMessage.h"
-#import "../JKLogFormatter.h"
+#import <JKLoger/JKLogMessage.h>
+#import <JKLoger/JKLogFormatter.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
 @interface JKRemoteDestination ()

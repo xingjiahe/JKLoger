@@ -7,8 +7,8 @@
 //
 
 #import "JKFileDestination.h"
-#import "../JKLogMessage.h"
-#import "../JKLogFormatter.h"
+#import <JKLoger/JKLogMessage.h>
+#import <JKLoger/JKLogFormatter.h>
 
 @interface JKFileDestination ()
 

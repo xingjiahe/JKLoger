@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "../JKLogFormatter.h"
+#import <JKLoger/JKLogFormatter.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

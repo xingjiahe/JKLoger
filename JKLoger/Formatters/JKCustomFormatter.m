@@ -7,8 +7,8 @@
 //
 
 #import "JKCustomFormatter.h"
-#import "../JKLogMessage.h"
-#import "../JKLogLevel.h"
+#import <JKLoger/JKLogMessage.h>
+#import <JKLoger/JKLogLevel.h>
 
 @implementation JKCustomFormatter
 

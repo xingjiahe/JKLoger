@@ -24,13 +24,13 @@ FOUNDATION_EXPORT const unsigned char JKLogerVersionString[];
 #import "JKLogFormatter.h"
 
 // Destinations
-#import "Destinations/JKConsoleDestination.h"
-#import "Destinations/JKFileDestination.h"
-#import "Destinations/JKRemoteDestination.h"
+#import <JKLoger/JKConsoleDestination.h>
+#import <JKLoger/JKFileDestination.h>
+#import <JKLoger/JKRemoteDestination.h>
 
 // Formatters
-#import "Formatters/JKDefaultFormatter.h"
-#import "Formatters/JKCustomFormatter.h"
+#import <JKLoger/JKDefaultFormatter.h>
+#import <JKLoger/JKCustomFormatter.h>
 
 /**
  * JKLoger - A lightweight and extensible logging library for iOS

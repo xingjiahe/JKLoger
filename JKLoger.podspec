@@ -27,24 +27,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'JKLoger/**/*.{h,m}'
   s.public_header_files = 'JKLoger/**/*.h'
-  
-  s.frameworks = 'Foundation'
-  
-  # Subspecs for modular usage
-  s.subspec 'Core' do |core|
-    core.source_files = 'JKLoger/*.{h,m}'
-    core.public_header_files = 'JKLoger/*.h'
-  end
-  
-  s.subspec 'Destinations' do |destinations|
-    destinations.source_files = 'JKLoger/Destinations/*.{h,m}'
-    destinations.public_header_files = 'JKLoger/Destinations/*.h'
-    destinations.dependency 'JKLoger/Core'
-  end
-  
-  s.subspec 'Formatters' do |formatters|
-    formatters.source_files = 'JKLoger/Formatters/*.{h,m}'
-    formatters.public_header_files = 'JKLoger/Formatters/*.h'
-    formatters.dependency 'JKLoger/Core'
-  end
+
+  s.frameworks = 'Foundation', 'SystemConfiguration'
 end

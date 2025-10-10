@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "../JKLogDestination.h"
-#import "../JKLogLevel.h"
+#import <JKLoger/JKLogDestination.h>
+#import <JKLoger/JKLogLevel.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
