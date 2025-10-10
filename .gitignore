@@ -38,3 +38,16 @@ docs_demo
 
 # IDE
 .kiro/
+
+# Complete Xcode workspace
+*.xcworkspace
+
+# Temporary shell scripts
+build_and_test.sh
+verify_xcode_build.sh
+
+# Compiled test binaries
+cli_test
+
+# Internal documentation
+PROJECT_STATUS.md
