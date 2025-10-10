@@ -1,10 +1,10 @@
 # JKLoger
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/xingjiahe/JKLoger)
-[![Platform](https://img.shields.io/badge/platform-iOS%2013%2B-lightgrey.svg)](https://github.com/xingjiahe/JKLoger)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/xingjiahe/JKLoger/blob/main/LICENSE)
-[![CocoaPods](https://img.shields.io/badge/CocoaPods-compatible-4BC51D.svg)](https://cocoapods.org/pods/JKLoger)
-[![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
+[![CocoaPods](https://img.shields.io/cocoapods/v/JKLoger.svg)](https://cocoapods.org/pods/JKLoger)
+[![Platform](https://img.shields.io/cocoapods/p/JKLoger.svg)](https://cocoapods.org/pods/JKLoger)
+[![License](https://img.shields.io/cocoapods/l/JKLoger.svg)](https://github.com/xingjiahe/JKLoger/blob/main/LICENSE)
+[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![Release](https://img.shields.io/github/v/release/xingjiahe/JKLoger.svg)](https://github.com/xingjiahe/JKLoger/releases)
 
 JKLoger is a lightweight, high-performance Objective-C logging library designed for iOS applications. It provides multiple log levels, extensible output destinations, customizable formatters, and thread-safe logging capabilities.
 
