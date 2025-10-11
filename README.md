@@ -23,6 +23,16 @@ JKLoger is a lightweight, high-performance Objective-C logging library designed 
 - 📊 **Rich Metadata**: Automatic capture of file, line, function, thread, and timestamp information
 - 🌐 **Remote Logging**: Built-in HTTP-based remote logging with batching and retry logic
 
+## 🎉 What's New in v1.0.2
+
+- ✅ **Static Framework Support** - Improved compatibility with CocoaPods static linking
+- ✅ **Bug Fix** - Resolved duplicate symbols error when using static framework
+- ✅ **Enhancement** - Better system HTTP headers inheritance (Accept-Language, User-Agent, etc.)
+
+See [CHANGELOG.md](CHANGELOG.md) for complete version history.
+
+---
+
 ## 安装
 
 ### CocoaPods
@@ -30,7 +40,25 @@ JKLoger is a lightweight, high-performance Objective-C logging library designed 
 在你的 `Podfile` 中添加：
 
 ```ruby
-pod 'JKLoger', '~> 1.0'
+platform :ios, '13.0'
+
+# Recommended: Use static framework (v1.0.2+)
+use_frameworks! :linkage => :static
+
+target 'YourApp' do
+  pod 'JKLoger', '~> 1.0.2'
+end
+```
+
+或使用动态框架：
+
+```ruby
+platform :ios, '13.0'
+use_frameworks!
+
+target 'YourApp' do
+  pod 'JKLoger', '~> 1.0.2'
+end
 ```
 
 然后运行：
@@ -38,6 +66,8 @@ pod 'JKLoger', '~> 1.0'
 ```bash
 pod install
 ```
+
+> **💡 提示：** v1.0.2+ 推荐使用静态框架以避免符号重复问题。
 
 ### Swift Package Manager
 
@@ -51,7 +81,7 @@ https://github.com/xingjiahe/JKLoger.git
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/xingjiahe/JKLoger.git", from: "1.0.0")
+    .package(url: "https://github.com/xingjiahe/JKLoger.git", from: "1.0.2")
 ]
 ```
 
