@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'JKLoger'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'A lightweight and extensible logging library for iOS'
   s.description      = <<-DESC
                        JKLoger is a lightweight, high-performance Objective-C logging library 
@@ -29,6 +29,7 @@ Pod::Spec.new do |s|
   s.public_header_files = 'JKLoger/**/*.h'
 
   s.frameworks = 'Foundation', 'SystemConfiguration'
+  s.static_framework = true
 
   s.pod_target_xcconfig = {
     'ENABLE_BITCODE' => 'NO',

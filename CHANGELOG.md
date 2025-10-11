@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Advanced filtering capabilities
 - Plugin architecture for custom destinations
 
+## [1.0.2] - 2025-10-11
+
+### Fixed
+- Fixed duplicate symbols error when using static framework linking
+- Improved framework integration to properly inherit system HTTP headers (Accept-Language, etc.)
+
+### Changed
+- Added `static_framework = true` to podspec for better compatibility
+- Updated Example Podfile to use static framework linkage (`:linkage => :static`)
+
 ## [1.0.0] - 2025-09-29
 
 ### Added
