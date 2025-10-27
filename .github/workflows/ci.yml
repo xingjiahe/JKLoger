@@ -167,7 +167,7 @@ jobs:
         ./performance_test
         
     - name: Upload Performance Results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: performance-results
         path: performance_results.txt
