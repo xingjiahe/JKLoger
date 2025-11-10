@@ -41,7 +41,7 @@ jobs:
           | xcpretty
           
     - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./build/reports/coverage.xml
